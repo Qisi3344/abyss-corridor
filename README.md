@@ -11,9 +11,11 @@
 
 ## 实机画面
 
-| 入口 | 屏息暂停 |
+| 入口 | 行进中（墙上的眼睛） |
 | --- | --- |
-| ![标题](docs/screenshots/title.png) | ![屏息](docs/screenshots/pause.png) |
+| ![标题](docs/screenshots/title.png) | ![行进](docs/screenshots/gameplay.png) |
+| **屏息暂停** | **它追上了你** |
+| ![屏息](docs/screenshots/pause.png) | ![死亡](docs/screenshots/death.png) |
 
 ## 运行
 
