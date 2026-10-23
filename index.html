@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>深渊回廊 · ABYSS CORRIDOR</title>
+<style>
+  :root { --bone: #c9bfa4; --blood: #a3221a; }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; background: #000; overflow: hidden; }
+  body { font-family: "Songti SC", "Noto Serif SC", Georgia, serif; color: var(--bone); user-select: none; }
+  #c { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
+  .scan { position: fixed; inset: 0; pointer-events: none; mix-blend-mode: multiply;
+    background: repeating-linear-gradient(to bottom, rgba(0,0,0,0) 0 2px, rgba(0,0,0,.18) 2px 3px); }
+  #hud { position: fixed; top: 10px; left: 14px; font-size: 13px; letter-spacing: .12em;
+    text-shadow: 0 1px 2px #000; pointer-events: none; }
+  #hud b { font-size: 20px; color: #e8dfc6; font-weight: 400; margin-left: 4px; }
+  #san { position: fixed; top: 12px; right: 14px; width: 120px; pointer-events: none; }
+  #san span { font-size: 10px; letter-spacing: .3em; color: #8a8270; }
+  #san .track { height: 6px; margin-top: 4px; background: #14100c; border: 1px solid #2c241c; }
+  #san .fill { height: 100%; background: #3f5a2c; transition: width .3s, background .5s; }
+  #vig { position: fixed; inset: 0; pointer-events: none;
+    background: radial-gradient(ellipse at 50% 50%, rgba(0,0,0,0) 42%, rgba(0,0,0,.85) 100%); }
+  #overlay { position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    background: rgba(0,0,0,.82); text-align: center; padding: 20px; transition: opacity .8s; }
+  #overlay.hide { opacity: 0; pointer-events: none; }
+  #overlay .kicker { font-size: 11px; letter-spacing: .6em; color: #6f7d72; margin-bottom: 10px; }
+  #overlay h1 { font-size: clamp(38px, 10vw, 64px); font-weight: 400; letter-spacing: .18em; color: #d9d0b5;
+    text-shadow: 0 0 24px rgba(160,60,40,.5), 3px 3px 0 #1a0605; }
+  #overlay .sub { font-size: 13px; letter-spacing: .3em; color: #8a8270; margin: 12px 0 6px; }
+  #overlay .keys { font-size: 12px; color: #6f7d72; line-height: 2; margin: 10px 0 22px; }
+  #overlay button { font: inherit; font-size: 17px; letter-spacing: .3em; color: var(--bone); cursor: pointer;
+    padding: 12px 44px; background: linear-gradient(#8a1a14, #4a0d0a); border: 1px solid #2a0605;
+    box-shadow: 0 2px 0 #000; }
+  #overlay button:active { transform: translateY(1px); }
+  #death { position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    background: #000; opacity: 0; pointer-events: none; transition: opacity 1.6s; text-align: center; }
+  #death.show { opacity: 1; pointer-events: auto; }
+  #death h2 { font-size: 24px; font-weight: 400; letter-spacing: .4em; color: #a3221a; margin-bottom: 14px; }
+  #death p { color: #8a8270; font-size: 14px; line-height: 2; margin-bottom: 26px; }
+  #death b { color: #e8dfc6; font-size: 22px; }
+  #death button { font: inherit; letter-spacing: .2em; color: var(--bone); cursor: pointer; padding: 10px 34px;
+    background: #14100c; border: 1px solid #3a2a1c; }
+  #touchL, #touchR { position: fixed; bottom: 0; width: 50%; height: 45%; z-index: 5; }
+  #touchL { left: 0; } #touchR { right: 0; }
+  @media (hover: hover) and (pointer: fine) { #touchL, #touchR { display: none; } }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div class="scan"></div>
+<div id="vig"></div>
+<div id="hud">深度<b id="depth">0</b><span style="font-size:10px"> m</span></div>
+<div id="san"><span>SAN</span><div class="track"><div class="fill" id="sanFill" style="width:100%"></div></div></div>
+<div id="overlay">
+  <div class="kicker">— 深 渊 回 廊 —</div>
+  <h1>深渊回廊</h1>
+  <p class="sub">ABYSS CORRIDOR · 不要停下</p>
+  <p class="keys">WASD / 方向键 移动 · 鼠标 转向（点击锁定）<br>手机：左半屏移动 · 右半屏转向<br>收集眼球维持神智。身后那位，一直在走。</p>
+  <button id="btnStart">走 入 回 廊</button>
+</div>
+<div id="death">
+  <h2>它追上了你</h2>
+  <p>回廊在 <b id="finalDepth">0</b> 米处合拢。<br>你数过的那些眼睛，替它记住了路。</p>
+  <button id="btnAgain">再 走 一 次</button>
+</div>
+<div id="touchL" aria-hidden="true"></div>
+<div id="touchR" aria-hidden="true"></div>
+<script src="js/vendor/three.min.js"></script>
+<script src="js/game.js"></script>
+</body>
+</html>
