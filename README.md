@@ -17,12 +17,16 @@
 
 ## 运行
 
-纯静态，无需构建：
+纯静态，无需构建。Windows 最省事：双击 `D:\zcode\projects\启动-深渊回廊.bat`。
+
+或手动：
 
 ```bash
-python3 -m http.server 8000
+python serve.py 8000
 # 打开 http://localhost:8000
 ```
+
+（serve.py 带 no-cache 头；`python -m http.server` 也可以。）
 
 （直接双击 index.html 也可以。音频需要一次点击后才会开始——浏览器规矩。）
 
