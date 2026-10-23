@@ -498,11 +498,15 @@
     camera.rotation.set(0, 0, 0);
     torch.position.set(0, 1.9, 0);
   }
+  function setMode(m) {
+    state.mode = m;
+    document.body.classList.toggle('playing', m === 'play');
+  }
   function start() {
     A.init();
     if (A.ctx && A.ctx.state === 'suspended') A.ctx.resume();
     reset();
-    state.mode = 'play';
+    setMode('play');
     document.getElementById('overlay').classList.add('hide');
     document.getElementById('death').classList.remove('show');
     document.getElementById('pause').classList.remove('show');
@@ -511,7 +515,7 @@
     }
   }
   function die() {
-    state.mode = 'dead';
+    setMode('dead');
     deadAt = performance.now();
     sfx.death();
     document.getElementById('finalDepth').textContent = Math.floor(depth);
@@ -527,12 +531,12 @@
   let deadAt = 0;
   function setPause(on) {
     if (on && state.mode === 'play') {
-      state.mode = 'pause';
+      setMode('pause');
       if (A.ctx && A.ctx.state === 'running') A.ctx.suspend();
       document.getElementById('pause').classList.add('show');
       if (document.exitPointerLock) document.exitPointerLock();
     } else if (!on && state.mode === 'pause') {
-      state.mode = 'play';
+      setMode('play');
       if (A.ctx && A.ctx.state === 'suspended') A.ctx.resume();
       document.getElementById('pause').classList.remove('show');
       last = performance.now();
@@ -563,6 +567,7 @@
 
   document.getElementById('btnStart').addEventListener('click', start);
   document.getElementById('btnAgain').addEventListener('click', start);
+  document.getElementById('btnPause').addEventListener('click', () => setPause(true));
   document.getElementById('btnResume').addEventListener('click', () => setPause(false));
   document.getElementById('btnRestart').addEventListener('click', () => {
     document.getElementById('pause').classList.remove('show');
