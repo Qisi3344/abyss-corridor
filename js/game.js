@@ -236,7 +236,7 @@
     if (A.ok) return;
     try { A.ctx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { return; }
     const ctx = A.ctx;
-    A.master = ctx.createGain(); A.master.gain.value = 0.8;
+    A.master = ctx.createGain(); A.master.gain.value = +(localStorage.getItem('abyss_vol') ?? 0.8);
     const comp = ctx.createDynamicsCompressor();
     A.master.connect(comp); comp.connect(ctx.destination);
     A.noise = ctx.createBuffer(1, ctx.sampleRate * 2, ctx.sampleRate);
@@ -286,7 +286,15 @@
 
   // ---------- 输入 ----------
   const keys = {};
-  window.addEventListener('keydown', e => { keys[e.code] = true; });
+  window.addEventListener('keydown', e => {
+    keys[e.code] = true;
+    if (e.repeat) return;
+    if (e.code === 'KeyP' || e.code === 'Escape') { setPause(state.mode === 'play'); return; }
+    if ((e.code === 'Space' || e.code === 'Enter')) {
+      if (state.mode === 'title' || (state.mode === 'dead' && performance.now() - deadAt > 800)) { start(); e.preventDefault(); return; }
+      if (state.mode === 'pause') { setPause(false); e.preventDefault(); return; }
+    }
+  });
   window.addEventListener('keyup', e => { keys[e.code] = false; });
   const look = { yaw: 0, locked: false };
   const canvas = renderer.domElement;
@@ -497,16 +505,70 @@
     state.mode = 'play';
     document.getElementById('overlay').classList.add('hide');
     document.getElementById('death').classList.remove('show');
+    document.getElementById('pause').classList.remove('show');
+    if (canvas.requestPointerLock && matchMedia('(hover: hover) and (pointer: fine)').matches) {
+      canvas.requestPointerLock();
+    }
   }
   function die() {
     state.mode = 'dead';
+    deadAt = performance.now();
     sfx.death();
     document.getElementById('finalDepth').textContent = Math.floor(depth);
+    const best = Math.max(Math.floor(depth), +(localStorage.getItem('abyss_best') || 0));
+    localStorage.setItem('abyss_best', best);
+    document.getElementById('bestLine').innerHTML =
+      (Math.floor(depth) >= best && depth > 0 ? '★ 最深纪录 <b>' + best + '</b> 米<br>' : '走过最深 <b>' + best + '</b> 米<br>');
     document.getElementById('death').classList.add('show');
     if (document.exitPointerLock) document.exitPointerLock();
   }
+
+  // ---------- 屏息（暂停） ----------
+  let deadAt = 0;
+  function setPause(on) {
+    if (on && state.mode === 'play') {
+      state.mode = 'pause';
+      if (A.ctx && A.ctx.state === 'running') A.ctx.suspend();
+      document.getElementById('pause').classList.add('show');
+      if (document.exitPointerLock) document.exitPointerLock();
+    } else if (!on && state.mode === 'pause') {
+      state.mode = 'play';
+      if (A.ctx && A.ctx.state === 'suspended') A.ctx.resume();
+      document.getElementById('pause').classList.remove('show');
+      last = performance.now();
+      if (canvas.requestPointerLock && matchMedia('(hover: hover) and (pointer: fine)').matches) {
+        canvas.requestPointerLock();
+      }
+    }
+  }
+  // 桌面：指针锁定被解除（点 ESC / 切窗）即屏息——逃亡不该有人看守你的窗口
+  document.addEventListener('pointerlockchange', () => {
+    if (state.mode === 'play' && !document.pointerLockElement && matchMedia('(hover: hover) and (pointer: fine)').matches) {
+      setPause(true);
+    }
+  });
+  window.addEventListener('blur', () => setPause(true));
+
+  // 音量滑条：即时生效并持久化
+  function initVolume() {
+    const slider = document.getElementById('vol');
+    slider.value = +(localStorage.getItem('abyss_vol') ?? 0.8);
+    slider.addEventListener('input', () => {
+      const v = +slider.value;
+      if (A.ok) A.master.gain.value = v;
+      localStorage.setItem('abyss_vol', v);
+    });
+  }
+  initVolume();
+
   document.getElementById('btnStart').addEventListener('click', start);
   document.getElementById('btnAgain').addEventListener('click', start);
+  document.getElementById('btnResume').addEventListener('click', () => setPause(false));
+  document.getElementById('btnRestart').addEventListener('click', () => {
+    document.getElementById('pause').classList.remove('show');
+    if (A.ctx && A.ctx.state === 'suspended') A.ctx.resume();
+    start();
+  });
 
   function resize() {
     const w = window.innerWidth, h = window.innerHeight;

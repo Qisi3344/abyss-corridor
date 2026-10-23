@@ -44,6 +44,19 @@
   #touchL, #touchR { position: fixed; bottom: 0; width: 50%; height: 45%; z-index: 5; }
   #touchL { left: 0; } #touchR { right: 0; }
   @media (hover: hover) and (pointer: fine) { #touchL, #touchR { display: none; } }
+  #pause { position: fixed; inset: 0; z-index: 9; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    background: rgba(0,0,0,.88); opacity: 0; pointer-events: none; transition: opacity .5s; text-align: center; }
+  #pause.show { opacity: 1; pointer-events: auto; }
+  #pause h2 { font-size: 22px; font-weight: 400; letter-spacing: .5em; color: #d9d0b5; margin-bottom: 6px; }
+  #pause .sub { font-size: 12px; letter-spacing: .25em; color: #6f7d72; margin-bottom: 24px; }
+  #pause button { font: inherit; font-size: 15px; letter-spacing: .3em; color: var(--bone); cursor: pointer;
+    width: 220px; margin: 8px 0; padding: 11px 0; background: #14100c; border: 1px solid #3a2a1c; }
+  #pause button:hover { border-color: #6a4a2c; }
+  #pause .vol { margin-top: 18px; width: 220px; text-align: left; }
+  #pause .vol label { font-size: 10px; letter-spacing: .3em; color: #8a8270; display: block; margin-bottom: 6px; }
+  #pause input[type=range] { width: 100%; accent-color: #8a1a14; cursor: pointer; }
+  #pause .keys2 { margin-top: 14px; font-size: 11px; line-height: 1.9; color: #55503f; letter-spacing: .12em; }
+  #death .hint { font-size: 11px; letter-spacing: .2em; color: #55503f; margin-top: 14px; }
 </style>
 </head>
 <body>
@@ -59,10 +72,22 @@
   <p class="keys">WASD / 方向键 移动 · 鼠标 转向（点击锁定）<br>手机：左半屏移动 · 右半屏转向<br>收集眼球维持神智。身后那位，一直在走。</p>
   <button id="btnStart">走 入 回 廊</button>
 </div>
+<div id="pause">
+  <h2>屏 息</h2>
+  <p class="sub">那位在雾里等你 · 回来的路你记得</p>
+  <button id="btnResume">睁 开 眼 睛</button>
+  <button id="btnRestart">重 新 走</button>
+  <div class="vol">
+    <label>主音量</label>
+    <input type="range" id="vol" min="0" max="1" step="0.01">
+  </div>
+  <p class="keys2">WASD 移动 · 鼠标转向 · P / ESC 屏息</p>
+</div>
 <div id="death">
   <h2>它追上了你</h2>
-  <p>回廊在 <b id="finalDepth">0</b> 米处合拢。<br>你数过的那些眼睛，替它记住了路。</p>
+  <p>回廊在 <b id="finalDepth">0</b> 米处合拢。<br><span id="bestLine"></span>你数过的那些眼睛，替它记住了路。</p>
   <button id="btnAgain">再 走 一 次</button>
+  <div class="hint">SPACE / ENTER 再走一次</div>
 </div>
 <div id="touchL" aria-hidden="true"></div>
 <div id="touchR" aria-hidden="true"></div>
